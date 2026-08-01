@@ -20,6 +20,11 @@
 15. [Merge Intervals](#15-merge-intervals)
 16. [Matrix — Set Matrix Zeroes](#16-matrix--set-matrix-zeroes)
 17. [Matrix — Spiral Matrix](#17-matrix--spiral-matrix)
+18. [Sorting — Bubble Sort](#18-sorting--bubble-sort)
+19. [Sorting — Selection Sort](#19-sorting--selection-sort)
+20. [Sorting — Insertion Sort](#20-sorting--insertion-sort)
+21. [Sorting — Merge Sort](#21-sorting--merge-sort)
+22. [Prefix & Suffix Product — Product of Array Except Self](#22-prefix--suffix-product--product-of-array-except-self)
 
 ---
 
@@ -714,6 +719,206 @@ def set_spiral_order(mat):
 
 ---
 
+## 18. Sorting — Bubble Sort
+
+**File:** `02sorting/01_bubble_sort.py`
+**LeetCode:** — (fundamental; used in variants like 283. Move Zeroes)
+
+**Pattern:** Adjacent Swapping (Brute Sorting)  
+**When to use:** Understand the simplest sorting idea; small or nearly sorted arrays.
+
+**Algorithm:**
+- Loop `i` times for each pass over the array.
+- In each pass, compare adjacent elements `nums[j]` and `nums[j+1]`.
+- If `nums[j] > nums[j+1]`, swap them (bigger elements "bubble up" to the end).
+- After each pass, the largest remaining element is fixed at the end, so inner loop shrinks by `i`.
+
+**Code:**
+```python
+def bubble_sort(nums):
+    n = len(nums)
+    for i in range(n - 1):
+        for j in range(n - 1 - i):
+            if nums[j] > nums[j + 1]:
+                nums[j], nums[j + 1] = nums[j + 1], nums[j]
+    return nums
+```
+
+**Time:** O(n²) worst/avg, O(n) best (already sorted with flag) | **Space:** O(1)
+
+---
+
+## 19. Sorting — Selection Sort
+
+**File:** `02sorting/02_selection_sort.py`
+**LeetCode:** — (concept in 215. Kth Largest Element, 912. Sort an Array)
+
+**Pattern:** Find-Minimum-and-Swap  
+**When to use:** Small arrays where number of swaps must be minimized.
+
+**Algorithm:**
+- For each position `i`, assume `min = i`.
+- Scan the rest of the array from `i+1` to find the smallest element.
+- If a smaller element is found, update `min`.
+- Swap `nums[i]` with `nums[min]` — the correct element is now fixed in place.
+
+**Code:**
+```python
+def selection_sort(nums):
+    n = len(nums)
+    for i in range(n - 1):
+        min = i
+        for j in range(i + 1, n):
+            if nums[j] < nums[min]:
+                min = j
+        nums[i], nums[min] = nums[min], nums[i]
+    return nums
+```
+
+**Time:** O(n²) always | **Space:** O(1)
+
+---
+
+## 20. Sorting — Insertion Sort
+
+**File:** `02sorting/03_inserction_sort.py`
+**LeetCode:** — (concept in 147. Insertion Sort List)
+
+**Pattern:** Insert into Sorted Left Part (like playing cards)  
+**When to use:** Small or nearly sorted arrays; stable sorting; online (incremental) data.
+
+**Algorithm:**
+- Start from index 1 (left part is already sorted).
+- Pick `key = nums[i]`, then shift larger elements one position right using `j = i - 1`.
+- While `j >= 0` and `nums[j] > key`, move `nums[j]` to `nums[j+1]` and decrement `j`.
+- Place `key` at `nums[j+1]` — the sorted part now grows by one.
+
+**Code:**
+```python
+def insertion_sort(nums):
+    n = len(nums)
+    for i in range(1, n):
+        key = nums[i]
+        j = i - 1
+        while j >= 0 and nums[j] > key:
+            nums[j + 1] = nums[j]
+            j -= 1
+        nums[j + 1] = key
+    return nums
+```
+
+**Time:** O(n²) worst/avg, O(n) best (already sorted) | **Space:** O(1)
+
+---
+
+## 21. Sorting — Merge Sort
+
+**File:** `02sorting/04_merge_sort.py`
+**LeetCode:** 912. Sort an Array | 148. Sort List | 23. Merge k Sorted Lists
+
+**Pattern:** Divide & Conquer (Recursive Split + Merge)  
+**When to use:** Stable sort needed; large arrays where O(n log n) is required; linked list sorting.
+
+**Algorithm:**
+- **Divide:** Recursively split the array into two halves until each half has 1 element.
+- **Conquer:** Merge two sorted halves back together:
+  - Create temp arrays `L` and `R` from the halves.
+  - Compare `L[i]` and `R[j]`, placing the smaller into `nums[k]`.
+  - Copy any remaining elements from `L` or `R`.
+- Base case: `l >= r` → single element is already sorted.
+
+**Code:**
+```python
+def merge(nums, l, m, r):
+    s1 = m - l + 1
+    s2 = r - m
+    L = [0] * s1
+    R = [0] * s2
+    for i in range(s1):
+        L[i] = nums[l + i]
+    for j in range(s2):
+        R[j] = nums[m + 1 + j]
+    i = j = 0
+    k = l
+    while i < s1 and j < s2:
+        if L[i] <= R[j]:
+            nums[k] = L[i]
+            i += 1
+        else:
+            nums[k] = R[j]
+            j += 1
+        k += 1
+    while i < s1:
+        nums[k] = L[i]
+        i += 1
+        k += 1
+    while j < s2:
+        nums[k] = R[j]
+        j += 1
+        k += 1
+
+def divide(nums, l, r):
+    if l < r:
+        m = (l + r) // 2
+        divide(nums, l, m)
+        divide(nums, m + 1, r)
+        merge(nums, l, m, r)
+    return nums
+```
+
+**Time:** O(n log n) always | **Space:** O(n) (temp arrays + recursion)
+
+---
+
+## 22. Prefix & Suffix Product — Product of Array Except Self
+
+**File:** `01array/14_product_without_self.py`
+**LeetCode:** 238. Product of Array Except Self
+
+**Pattern:** Prefix & Suffix Product (running product)  
+**When to use:** Find product of all elements except `nums[i]` without division (handles zeroes safely).
+
+**Algorithm:**
+- **Brute:** For each index `i`, multiply all elements where `i != j`. O(n²) — too slow.
+- **Optimal (prefix × suffix):**
+  1. `ans[i]` = product of all elements **to the left** of `i` (prefix pass).
+  2. Multiply `ans[i]` by product of all elements **to the right** of `i` (suffix pass, scanning from end).
+  3. Use running `prefix` / `suffix` variables instead of extra arrays → O(1) extra space.
+
+**Code:**
+```python
+def product_of_array_without_self(nums):
+    n = len(nums)
+    ans = [1] * n
+    for i in range(n):
+        prod = 1
+        for j in range(n):
+            if i != j:
+                prod *= nums[j]
+            ans[i] = prod
+    return ans
+
+def productExceptSelf(nums):
+    n = len(nums)
+    ans = [1] * n
+
+    prefix = 1
+    for i in range(n):
+        ans[i] = prefix
+        prefix *= nums[i]
+
+    suffix = 1
+    for i in range(n - 1, -1, -1):
+        ans[i] *= suffix
+        suffix *= nums[i]
+
+    return ans
+```
+
+**Time:** O(n²) brute / O(n) optimal | **Space:** O(n) output (O(1) extra in optimal)
+
+---
+
 ## Pattern Cheat Sheet
 
 | # | Pattern | Use Case |
@@ -735,3 +940,8 @@ def set_spiral_order(mat):
 | 15 | Sort + Greedy Merge | Merge overlapping intervals |
 | 16 | In-place Marker / First Row-Col Flags | Set matrix zeroes |
 | 17 | Boundary Traversal | Spiral order traversal |
+| 18 | Adjacent Swapping | Bubble sort |
+| 19 | Find-Minimum-and-Swap | Selection sort |
+| 20 | Insert into Sorted Left Part | Insertion sort |
+| 21 | Divide & Conquer (Split + Merge) | Merge sort |
+| 22 | Prefix & Suffix Product | Product of array except self |
