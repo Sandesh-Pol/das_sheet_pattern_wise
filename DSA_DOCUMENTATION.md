@@ -20,11 +20,17 @@
 15. [Merge Intervals](#15-merge-intervals)
 16. [Matrix — Set Matrix Zeroes](#16-matrix--set-matrix-zeroes)
 17. [Matrix — Spiral Matrix](#17-matrix--spiral-matrix)
-18. [Sorting — Bubble Sort](#18-sorting--bubble-sort)
-19. [Sorting — Selection Sort](#19-sorting--selection-sort)
-20. [Sorting — Insertion Sort](#20-sorting--insertion-sort)
-21. [Sorting — Merge Sort](#21-sorting--merge-sort)
-22. [Prefix & Suffix Product — Product of Array Except Self](#22-prefix--suffix-product--product-of-array-except-self)
+18. [Prefix & Suffix Product — Product of Array Except Self](#18-prefix--suffix-product--product-of-array-except-self)
+19. [Sorting — Bubble Sort](#19-sorting--bubble-sort)
+20. [Sorting — Selection Sort](#20-sorting--selection-sort)
+21. [Sorting — Insertion Sort](#21-sorting--insertion-sort)
+22. [Sorting — Merge Sort](#22-sorting--merge-sort)
+23. [Binary Search — Classic Search](#23-binary-search--classic-search)
+24. [Binary Search — Lower Bound / Insert Position](#24-binary-search--lower-bound--insert-position)
+25. [Binary Search — First & Last Position](#25-binary-search--first--last-position)
+26. [Binary Search — Search in Rotated Sorted Array](#26-binary-search--search-in-rotated-sorted-array)
+27. [Binary Search — Minimum in Rotated Sorted Array](#27-binary-search--minimum-in-rotated-sorted-array)
+28. [Binary Search — Find Peak Element](#28-binary-search--find-peak-element)
 
 ---
 
@@ -719,7 +725,56 @@ def set_spiral_order(mat):
 
 ---
 
-## 18. Sorting — Bubble Sort
+## 18. Prefix & Suffix Product — Product of Array Except Self
+
+**File:** `01array/14_product_without_self.py`
+**LeetCode:** 238. Product of Array Except Self
+
+**Pattern:** Prefix & Suffix Product (running product)  
+**When to use:** Find product of all elements except `nums[i]` without division (handles zeroes safely).
+
+**Algorithm:**
+- **Brute:** For each index `i`, multiply all elements where `i != j`. O(n²) — too slow.
+- **Optimal (prefix × suffix):**
+  1. `ans[i]` = product of all elements **to the left** of `i` (prefix pass).
+  2. Multiply `ans[i]` by product of all elements **to the right** of `i` (suffix pass, scanning from end).
+  3. Use running `prefix` / `suffix` variables instead of extra arrays → O(1) extra space.
+
+**Code:**
+```python
+def product_of_array_without_self(nums):
+    n = len(nums)
+    ans = [1] * n
+    for i in range(n):
+        prod = 1
+        for j in range(n):
+            if i != j:
+                prod *= nums[j]
+            ans[i] = prod
+    return ans
+
+def productExceptSelf(nums):
+    n = len(nums)
+    ans = [1] * n
+
+    prefix = 1
+    for i in range(n):
+        ans[i] = prefix
+        prefix *= nums[i]
+
+    suffix = 1
+    for i in range(n - 1, -1, -1):
+        ans[i] *= suffix
+        suffix *= nums[i]
+
+    return ans
+```
+
+**Time:** O(n²) brute / O(n) optimal | **Space:** O(n) output (O(1) extra in optimal)
+
+---
+
+## 19. Sorting — Bubble Sort
 
 **File:** `02sorting/01_bubble_sort.py`
 **LeetCode:** — (fundamental; used in variants like 283. Move Zeroes)
@@ -748,7 +803,7 @@ def bubble_sort(nums):
 
 ---
 
-## 19. Sorting — Selection Sort
+## 20. Sorting — Selection Sort
 
 **File:** `02sorting/02_selection_sort.py`
 **LeetCode:** — (concept in 215. Kth Largest Element, 912. Sort an Array)
@@ -779,7 +834,7 @@ def selection_sort(nums):
 
 ---
 
-## 20. Sorting — Insertion Sort
+## 21. Sorting — Insertion Sort
 
 **File:** `02sorting/03_inserction_sort.py`
 **LeetCode:** — (concept in 147. Insertion Sort List)
@@ -811,7 +866,7 @@ def insertion_sort(nums):
 
 ---
 
-## 21. Sorting — Merge Sort
+## 22. Sorting — Merge Sort
 
 **File:** `02sorting/04_merge_sort.py`
 **LeetCode:** 912. Sort an Array | 148. Sort List | 23. Merge k Sorted Lists
@@ -870,52 +925,280 @@ def divide(nums, l, r):
 
 ---
 
-## 22. Prefix & Suffix Product — Product of Array Except Self
+## 23. Binary Search — Classic Search
 
-**File:** `01array/14_product_without_self.py`
-**LeetCode:** 238. Product of Array Except Self
+**File:** `03binary/01_binary_search.py`
+**LeetCode:** 704. Binary Search
 
-**Pattern:** Prefix & Suffix Product (running product)  
-**When to use:** Find product of all elements except `nums[i]` without division (handles zeroes safely).
+**Pattern:** Divide & Conquer on Sorted Array  
+**When to use:** Search for a target in a sorted array in O(log n) time.
 
 **Algorithm:**
-- **Brute:** For each index `i`, multiply all elements where `i != j`. O(n²) — too slow.
-- **Optimal (prefix × suffix):**
-  1. `ans[i]` = product of all elements **to the left** of `i` (prefix pass).
-  2. Multiply `ans[i]` by product of all elements **to the right** of `i` (suffix pass, scanning from end).
-  3. Use running `prefix` / `suffix` variables instead of extra arrays → O(1) extra space.
+- Set `l = 0`, `r = len(nums) - 1`.
+- While `l <= r`:
+  - `mid = (l + r) // 2`.
+  - If `nums[mid] == target` → return `mid`.
+  - If `nums[mid] < target` → search right half (`l = mid + 1`).
+  - Else → search left half (`r = mid - 1`).
+- Return `-1` if target not found.
 
 **Code:**
 ```python
-def product_of_array_without_self(nums):
-    n = len(nums)
-    ans = [1] * n
-    for i in range(n):
-        prod = 1
-        for j in range(n):
-            if i != j:
-                prod *= nums[j]
-            ans[i] = prod
-    return ans
+def binary_search(nums, target):
+    l = 0
+    r = len(nums) - 1
 
-def productExceptSelf(nums):
-    n = len(nums)
-    ans = [1] * n
+    while l <= r:
+        mid = (l + r) // 2
 
-    prefix = 1
-    for i in range(n):
-        ans[i] = prefix
-        prefix *= nums[i]
+        if nums[mid] == target:
+            return mid
+        elif nums[mid] < target:
+            l = mid + 1
+        else:
+            r = mid - 1
 
-    suffix = 1
-    for i in range(n - 1, -1, -1):
-        ans[i] *= suffix
-        suffix *= nums[i]
-
-    return ans
+    return -1
 ```
 
-**Time:** O(n²) brute / O(n) optimal | **Space:** O(n) output (O(1) extra in optimal)
+**Time:** O(log n) | **Space:** O(1)
+
+---
+
+## 24. Binary Search — Lower Bound / Insert Position
+
+**File:** `03binary/02_lower_bound_search_at_insert_pos.py`
+**LeetCode:** 35. Search Insert Position
+
+**Pattern:** Lower Bound (first index where `nums[mid] >= target`)  
+**When to use:** Find insertion position for a target in a sorted array; template for lower bound.
+
+**Algorithm:**
+- Standard binary search loop with `l <= r`.
+- If `nums[mid] == target` → return `mid` (position found).
+- Else narrow the search; when the loop ends, `l` is the first index where `nums[l] >= target`.
+- Return `l` (safe insert position).
+
+**Code:**
+```python
+def lower_bound(nums, target):
+    l = 0
+    r = len(nums) - 1
+
+    while l <= r:
+        mid = l + (r - l) // 2
+        if nums[mid] == target:
+            return mid
+
+        elif nums[mid] > target:
+                r = mid - 1
+        else:
+                l = mid + 1
+
+    return l
+```
+
+**Time:** O(log n) | **Space:** O(1)
+
+---
+
+## 25. Binary Search — First & Last Position
+
+**File:** `03binary/03_lower_and_upper_bound.py`
+**LeetCode:** 34. Find First and Last Position of Element in Sorted Array
+
+**Pattern:** Dual Binary Search (left bound + right bound)  
+**When to use:** Find the range of a target in a sorted array with duplicates.
+
+**Algorithm:**
+- **Left bound:** binary search that keeps searching left after a match — on match, save `index` and set `high = mid - 1`.
+- **Right bound:** binary search that keeps searching right after a match — on match, save `index` and set `low = mid + 1`.
+- Return `[left, right]`; both stay `-1` if target absent.
+
+**Code:**
+```python
+def searchRange(nums, target):
+
+    def find_left_bound(nums, target):
+        index = -1
+        low = 0
+        high = len(nums) - 1
+
+        while low <= high:
+            mid = low + (high - low) // 2
+
+            if nums[mid] == target:
+                index = mid
+                high = mid - 1
+            elif nums[mid] < target:
+                low = mid + 1
+            else:
+                high = mid - 1
+
+        return index
+
+    def find_right_bound(nums, target):
+        index = -1
+        low = 0
+        high = len(nums) - 1
+
+        while low <= high:
+            mid = low + (high - low) // 2
+
+            if nums[mid] == target:
+                index = mid
+                low = mid + 1
+            elif nums[mid] < target:
+                low = mid + 1
+            else:
+                high = mid - 1
+
+        return index
+
+    return [find_left_bound(nums, target), find_right_bound(nums, target)]
+```
+
+**Time:** O(log n) | **Space:** O(1)
+
+---
+
+## 26. Binary Search — Search in Rotated Sorted Array
+
+**File:** `03binary/04_rotating_array.py`
+**LeetCode:** 33. Search in Rotated Sorted Array
+
+**Pattern:** Partition Check (identify sorted half)  
+**When to use:** Search in an array rotated at an unknown pivot — at least one half is always sorted.
+
+**Algorithm:**
+- Base case: `l > r` → `-1`.
+- `mid = l + (r - l) // 2`. If `nums[mid] == target` → return `mid`.
+- **If left half is sorted** (`nums[l] <= nums[mid]`):
+  - Target in `[nums[l], nums[mid])` → recurse left, else recurse right.
+- **Else right half is sorted:**
+  - Target in `(nums[mid], nums[r]]` → recurse right, else recurse left.
+
+**Code:**
+```python
+def rotated_array(nums, target, l, r):
+
+    if l > r:
+        return -1
+
+    mid = l + (r - l) // 2
+
+    if nums[mid] == target:
+        return mid
+
+    # Left half is sorted
+    if nums[l] <= nums[mid]:
+
+        if nums[l] <= target < nums[mid]:
+            return rotated_array(nums, target, l, mid - 1)
+        else:
+            return rotated_array(nums, target, mid + 1, r)
+
+    # Right half is sorted
+    else:
+
+        if nums[mid] < target <= nums[r]:
+            return rotated_array(nums, target, mid + 1, r)
+        else:
+            return rotated_array(nums, target, l, mid - 1)
+```
+
+**Time:** O(log n) | **Space:** O(log n) (recursion stack)
+
+---
+
+## 27. Binary Search — Minimum in Rotated Sorted Array
+
+**File:** `03binary/05_find_minimum_in_sorted_array.py`
+**LeetCode:** 153. Find Minimum in Rotated Sorted Array | 154. (with duplicates)
+
+**Pattern:** Boundary Binary Search (compare `mid` with `r`)  
+**When to use:** Find the pivot (minimum) of a rotated sorted array.
+
+**Algorithm:**
+- **Distinct values:** while `l < r`, `mid = (l + r) // 2`:
+  - If `nums[mid] > nums[r]` → min is in right half (`l = mid + 1`).
+  - Else → min is at `mid` or left (`r = mid`).
+- **With duplicates:** when `nums[mid] == nums[r]`, decrement `r -= 1` to skip the duplicate.
+
+**Code:**
+```python
+def find_minimim(nums):
+    l = 0
+    r = len(nums)-1
+
+    while l < r:
+
+        mid = (l+r)//2
+
+        if nums[mid] > nums[r]:
+            l = mid + 1
+
+        else:
+            r = mid
+
+    return nums[l]
+
+def find_minimim2(nums):
+    l = 0
+    r = len(nums)-1
+
+    while l < r:
+
+        mid = (l+r)//2
+
+        if nums[mid] > nums[r]:
+            l = mid + 1
+
+        elif nums[mid] < nums[r]:
+            r = mid
+
+        else:
+            r -= 1
+
+    return nums[l]
+```
+
+**Time:** O(log n) (O(log n) avg, O(n) worst with duplicates) | **Space:** O(1)
+
+---
+
+## 28. Binary Search — Find Peak Element
+
+**File:** `03binary/06_peak_element.py`
+**LeetCode:** 162. Find Peak Element
+
+**Pattern:** Binary Search on Comparison (`mid` vs `mid+1`)  
+**When to use:** Find a peak (element greater than its neighbors) in O(log n); no full sorting required.
+
+**Algorithm:**
+- Binary search on indices. `mid = l + (r - l) // 2`.
+- If `nums[mid] < nums[mid + 1]` → peak lies on the right, move `l = mid + 1`.
+- Else → `nums[mid]` is at least a peak on the left side, move `r = mid`.
+- When `l == r`, return `l` (a valid peak index).
+
+**Code:**
+```python
+def find_peak_element(nums):
+    l = 0
+    r = len(nums)
+
+    while l < r:
+        mid = l + (r-l) // 2
+
+        if nums[mid] < nums[mid+1]:
+            l = mid + 1
+        else:
+            r = mid
+
+    return l
+```
+
+**Time:** O(log n) | **Space:** O(1)
 
 ---
 
@@ -940,8 +1223,14 @@ def productExceptSelf(nums):
 | 15 | Sort + Greedy Merge | Merge overlapping intervals |
 | 16 | In-place Marker / First Row-Col Flags | Set matrix zeroes |
 | 17 | Boundary Traversal | Spiral order traversal |
-| 18 | Adjacent Swapping | Bubble sort |
-| 19 | Find-Minimum-and-Swap | Selection sort |
-| 20 | Insert into Sorted Left Part | Insertion sort |
-| 21 | Divide & Conquer (Split + Merge) | Merge sort |
-| 22 | Prefix & Suffix Product | Product of array except self |
+| 18 | Prefix & Suffix Product | Product of array except self |
+| 19 | Adjacent Swapping | Bubble sort |
+| 20 | Find-Minimum-and-Swap | Selection sort |
+| 21 | Insert into Sorted Left Part | Insertion sort |
+| 22 | Divide & Conquer (Split + Merge) | Merge sort |
+| 23 | Divide & Conquer on Sorted Array | Classic binary search |
+| 24 | Lower Bound (first ≥ target) | Insert position |
+| 25 | Dual Binary Search (left/right) | First & last occurrence |
+| 26 | Partition Check (sorted half) | Search in rotated array |
+| 27 | Boundary Binary Search (mid vs r) | Min in rotated array |
+| 28 | Binary Search on Comparison | Find peak element |
