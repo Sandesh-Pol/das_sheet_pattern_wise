@@ -31,6 +31,8 @@
 26. [Binary Search — Search in Rotated Sorted Array](#26-binary-search--search-in-rotated-sorted-array)
 27. [Binary Search — Minimum in Rotated Sorted Array](#27-binary-search--minimum-in-rotated-sorted-array)
 28. [Binary Search — Find Peak Element](#28-binary-search--find-peak-element)
+29. [Binary Search — Aggressive Cows (Maximize Minimum Distance)](#29-binary-search--aggressive-cows-maximize-minimum-distance)
+30. [Binary Search — Minimum Speed to Arrive on Time](#30-binary-search--minimum-speed-to-arrive-on-time)
 
 ---
 
@@ -1202,6 +1204,125 @@ def find_peak_element(nums):
 
 ---
 
+## 29. Binary Search — Aggressive Cows (Maximize Minimum Distance)
+
+**File:** `03binary/07_addrasive_cow.py`
+**LeetCode:** — (InterviewBit: Aggressive Cows)
+
+**Pattern:** Binary Search on Answer (Max-min)  
+**When to use:** Place `cows` cows in sorted stall positions such that the minimum distance between any two cows is maximized.
+
+**Algorithm:**
+- Sort stalls ascending (assumes sorted input).
+- Feasibility check `can_place(stalls, cows, min_distance)`:
+  - Greedily place first cow at `stalls[0]`, track `last_pos`.
+  - For each position, if `stalls[i] - last_pos >= min_distance`, place a cow and update `last_pos`.
+  - Return `True` if all cows are placed.
+- Binary search distance range `low = 1`, `high = stalls[-1] - stalls[0]`.
+  - If `can_place(mid)` → feasible, save `ans = mid` and try larger distances (`low = mid + 1`).
+  - Else → try smaller distances (`high = mid - 1`).
+- Return `ans` (max feasible minimum distance).
+
+**Code:**
+```python
+def can_place(stalls, cows, min_distance):
+    count = 1
+    last_pos = stalls[0]
+
+    for i in range(1, len(stalls)):
+        if stalls[i] - last_pos >= min_distance:
+            count += 1
+            last_pos = stalls[i]
+
+            if count == cows:
+                return True
+
+    return False
+
+def aggressive_cow(stalls, cows):
+
+    low = 1
+    high = stalls[-1] - stalls[0]
+    ans = 0
+
+    while low <= high:
+
+        mid = low + (high - low) // 2
+
+        if can_place(stalls, cows, mid):
+            ans = mid
+            low = mid + 1
+
+        else:
+            high = mid - 1
+
+    return ans
+```
+
+**Time:** O(n log(max_distance)) | **Space:** O(1)
+
+---
+
+## 30. Binary Search — Minimum Speed to Arrive on Time
+
+**File:** `03binary/08_arrival_timeing_train.py`
+**LeetCode:** 1870. Minimum Speed to Arrive on Time
+
+**Pattern:** Binary Search on Answer (Min-max, with ceiling)  
+**When to use:** Find the minimum integer speed so the train arrives within `hr` hours. Every leg except the last rounds up to a full hour.
+
+**Algorithm:**
+- If `hr <= len(dist) - 1`, even the fastest travel needs `>= len(dist)-1` full-hour legs, so return `-1`.
+- Feasibility check `can_arrive(speed)`:
+  - For each leg except the last, add `ceil(dist[i] / speed)`.
+  - Add the exact float time of the last leg: `dist[-1] / speed`.
+  - Return `True` if total `<= hr`.
+- Binary search the speed `low = 1`, `high = 10**7`.
+  - If `can_arrive(mid)` → save `ans = mid`, try slower speeds (`high = mid - 1`).
+  - Else → increase speed (`low = mid + 1`).
+- Return `ans` (minimum feasible speed) or `-1` if impossible.
+
+**Code:**
+```python
+import math
+
+def min_arival_time(dist, hr):
+
+    if hr <= len(dist) - 1:
+        return -1
+
+    def can_arrive(speed):
+        total = 0
+
+        for i in range(len(dist) - 1):
+
+            total += math.ceil(float(dist[i]) / speed)
+
+        total += float(dist[-1]) / speed
+
+        return total <= hr
+
+    l = 1
+    h = 10 ** 7
+    ans = -1
+
+    while l <= h:
+
+        mid = l + (h - l) // 2
+
+        if can_arrive(mid):
+            ans = mid
+            h = mid - 1
+        else:
+            l = mid + 1
+
+    return ans
+```
+
+**Time:** O(n log(max_speed)) | **Space:** O(n) (round, from imports) / O(1) algorithmically
+
+---
+
 ## Pattern Cheat Sheet
 
 | # | Pattern | Use Case |
@@ -1234,3 +1355,5 @@ def find_peak_element(nums):
 | 26 | Partition Check (sorted half) | Search in rotated array |
 | 27 | Boundary Binary Search (mid vs r) | Min in rotated array |
 | 28 | Binary Search on Comparison | Find peak element |
+| 29 | Binary Search on Answer (Max-min) | Aggressive cows placement |
+| 30 | Binary Search on Answer (Min-max, ceiling) | Minimum speed to arrive on time |
