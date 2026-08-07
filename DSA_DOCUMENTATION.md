@@ -33,6 +33,9 @@
 28. [Binary Search — Find Peak Element](#28-binary-search--find-peak-element)
 29. [Binary Search — Aggressive Cows (Maximize Minimum Distance)](#29-binary-search--aggressive-cows-maximize-minimum-distance)
 30. [Binary Search — Minimum Speed to Arrive on Time](#30-binary-search--minimum-speed-to-arrive-on-time)
+31. [Two Pointer — Valid Palindrome](#31-two-pointer--valid-palindrome)
+32. [Hash Map — Valid Anagram](#32-hash-map--valid-anagram)
+33. [Vertical Scan — Longest Common Prefix](#33-vertical-scan--longest-common-prefix)
 
 ---
 
@@ -1323,6 +1326,122 @@ def min_arival_time(dist, hr):
 
 ---
 
+## 31. Two Pointer — Valid Palindrome
+
+**File:** `04string/01_string_pallendrom.py`
+**LeetCode:** 125. Valid Palindrome
+
+**Pattern:** Two Pointer (skip non-alphanumeric)  
+**When to use:** Check if a string is a palindrome while ignoring case and non-alphanumeric characters.
+
+**Algorithm:**
+- `l = 0`, `r = len(s) - 1`.
+- While `l < r`:
+  - Skip non-alphanumeric chars from the left (`l += 1`) and right (`r -= 1`).
+  - Compare `s[l].lower()` and `s[r].lower()`; if they differ, return `False`.
+  - Move both pointers inward.
+- Return `True`.
+
+**Code:**
+```python
+def check_pallendrom(s):
+    l = 0
+    r = len(s) - 1
+
+    while l < r:
+        while l < r and not s[l].isalnum():
+            l += 1
+        while l < r and not s[r].isalnum():
+            r -= 1
+        if s[l].lower() != s[r].lower():
+            return False
+        l += 1
+        r -= 1
+    return True
+```
+
+**Time:** O(n) | **Space:** O(1)
+
+---
+
+## 32. Hash Map — Valid Anagram
+
+**File:** `04string/02_string_anagram.py`
+**LeetCode:** 242. Valid Anagram
+
+**Pattern:** Hash Map (character frequency count)  
+**When to use:** Check if two strings are anagrams (same characters, same frequency, different order).
+
+**Algorithm:**
+- If lengths differ, return `False`.
+- Count each char of `s` into a `count` dictionary.
+- For each char of `t`:
+  - If char not in `count`, return `False`.
+  - Decrement its count; if it drops below `0`, return `False`.
+- Return `True`.
+
+**Code:**
+```python
+def isAnagram(s, t):
+    if len(s) != len(t):
+        return False
+
+    count = {}
+
+    for ch in s:
+        count[ch] = count.get(ch, 0) + 1
+
+    for ch in t:
+        if ch not in count:
+            return False
+        count[ch] -= 1
+        if count[ch] < 0:
+            return False
+
+    return True
+```
+
+**Time:** O(n) | **Space:** O(n) (character set)
+
+---
+
+## 33. Vertical Scan — Longest Common Prefix
+
+**File:** `04string/03_longest_common_prefix.py`
+**LeetCode:** 14. Longest Common Prefix
+
+**Pattern:** Vertical Scanning  
+**When to use:** Find the longest prefix shared by all strings in an array.
+
+**Algorithm:**
+- If array is empty, return `""`.
+- Take `first = strs[0]` as the candidate prefix.
+- For each index `i` in `first`:
+  - Compare `first[i]` against the same index in every other word.
+  - If any word is too short (`i >= len(word)`) or has a different char, return `first[:i]`.
+- Return `first` (all chars matched).
+
+**Code:**
+```python
+def longest_common_prefix(strs):
+    if not strs:
+        return ""
+
+    first = strs[0]
+
+    for i in range(len(first)):
+        ch = first[i]
+        for word in strs[1:]:
+            if i >= len(word) or word[i] != ch:
+                return first[:i]
+
+    return first
+```
+
+**Time:** O(n × m) (n = words, m = prefix length) | **Space:** O(1)
+
+---
+
 ## Pattern Cheat Sheet
 
 | # | Pattern | Use Case |
@@ -1357,3 +1476,6 @@ def min_arival_time(dist, hr):
 | 28 | Binary Search on Comparison | Find peak element |
 | 29 | Binary Search on Answer (Max-min) | Aggressive cows placement |
 | 30 | Binary Search on Answer (Min-max, ceiling) | Minimum speed to arrive on time |
+| 31 | Two Pointer (skip non-alphanumeric) | Valid palindrome |
+| 32 | Hash Map (character frequency) | Valid anagram |
+| 33 | Vertical Scanning | Longest common prefix |
